@@ -1,0 +1,26 @@
+# Generate the Xcode project on a Mac with:  brew install xcodegen && xcodegen
+name: VCXDiag
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  VCXDiag:
+    type: application
+    platform: iOS
+    sources: [VCXDiag]
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.vcxdiag
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: VCX Diag
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: "VCX Diag connects to the diagnostic bridge on your local network."
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: "VCX Diag connects to Bluetooth OBD adapters."
+  VCXDiagTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [VCXDiagTests]
+    dependencies:
+      - target: VCXDiag
