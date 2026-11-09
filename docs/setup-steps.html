@@ -1,0 +1,125 @@
+<title>VCX Diag Setup Steps</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a wiring-chain strip on top, then three colored lanes (PC, Mac, car), steps flow left to right and down. */
+:root {
+  --bg: #f3f5f8; --surface: #ffffff; --fg: #17202b; --muted: #5a6675; --line: #d5dbe3;
+  --pc: #1f6fd1; --pc-soft: #e3eefc;
+  --mac: #8a3fd1; --mac-soft: #f1e7fb;
+  --car: #e0641b; --car-soft: #fdeadf;
+  --ok: #1d9a5b; --ok-soft: #e1f5ea;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f141b; --surface: #18202a; --fg: #e8edf3; --muted: #9aa6b4; --line: #2a3542;
+  --pc: #5aa2ff; --pc-soft: #16263b; --mac: #c08bff; --mac-soft: #2a1d3a;
+  --car: #ff9550; --car-soft: #3a2416; --ok: #4fd18f; --ok-soft: #15301f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #18202a; --fg: #e8edf3; --muted: #9aa6b4; --line: #2a3542;
+  --pc: #5aa2ff; --pc-soft: #16263b; --mac: #c08bff; --mac-soft: #2a1d3a;
+  --car: #ff9550; --car-soft: #3a2416; --ok: #4fd18f; --ok-soft: #15301f; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); line-height: 1.5; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 32px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 28px; }
+h1 { font-family: var(--display); font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 65ch; margin: 8px 0 0; }
+h2 { font-family: var(--display); font-size: 1.5rem; margin: 0; letter-spacing: .02em; text-transform: uppercase; }
+code { font-family: var(--mono); font-size: .86em; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+
+.chain { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.node { display: grid; gap: 2px; padding: 10px 14px; border-radius: 10px; border: 2px solid; min-width: 0; }
+.node b { font-family: var(--display); font-size: 1.15rem; letter-spacing: .02em; }
+.node span { font-size: .8rem; color: var(--muted); }
+.n-phone { border-color: var(--mac); background: var(--mac-soft); }
+.n-pc { border-color: var(--pc); background: var(--pc-soft); }
+.n-vcx { border-color: var(--ok); background: var(--ok-soft); }
+.n-car { border-color: var(--car); background: var(--car-soft); }
+.link { font-family: var(--mono); font-size: .75rem; color: var(--muted); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.link::after { content: "→"; font-size: 1.3rem; color: var(--fg); }
+
+.lane { display: grid; gap: 14px; }
+.lane-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; border-bottom: 3px solid var(--c); padding-bottom: 6px; }
+.lane-head h2 { color: var(--c); }
+.lane-head p { margin: 0; color: var(--muted); font-size: .9rem; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; counter-reset: none; }
+.step { background: var(--surface); border: 1px solid var(--line); border-top: 5px solid var(--c); border-radius: 10px; padding: 14px; display: grid; gap: 6px; align-content: start; min-width: 0; position: relative; }
+.num { width: 32px; height: 32px; border-radius: 50%; background: var(--c); color: var(--surface); font-family: var(--display); font-size: 1.15rem; display: grid; place-items: center; }
+.step h3 { margin: 0; font-size: 1rem; font-weight: 600; text-wrap: balance; }
+.step p { margin: 0; font-size: .88rem; color: var(--muted); }
+.tag { justify-self: start; font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); }
+.tag.me { background: var(--pc-soft); color: var(--pc); }
+.pc { --c: var(--pc); } .mac { --c: var(--mac); } .car { --c: var(--car); } .done { --c: var(--ok); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: .85rem; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; background: var(--c); }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; font-size: .9rem; display: grid; gap: 6px; }
+.note h3 { margin: 0; font-size: 1rem; }
+.note ul { margin: 0; padding-left: 18px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>VCX Diag: from parts to a working scan</h1>
+    <p class="lede">The 12 steps to get the iPhone app reading codes from a GM vehicle through your VCX Nano. Do the blue steps once on the garage PC, the purple steps once on a Mac, and the orange steps each time you scan a car.</p>
+  </header>
+
+  <section class="chain" aria-label="How the parts connect">
+    <div class="node n-phone"><b>iPhone</b><span>VCX Diag app</span></div>
+    <div class="link">WiFi · TCP 7534</div>
+    <div class="node n-pc"><b>Windows PC</b><span>vcx_bridge.py</span></div>
+    <div class="link">J2534 driver</div>
+    <div class="node n-vcx"><b>VCX Nano</b><span>USB or WiFi</span></div>
+    <div class="link">OBD-II port</div>
+    <div class="node n-car"><b>GM vehicle</b><span>Class 2 VPW / GMLAN</span></div>
+  </section>
+
+  <div class="legend">
+    <span class="pc"><i></i>Garage PC, one time</span>
+    <span class="mac"><i></i>Mac + Xcode, one time</span>
+    <span class="car"><i></i>At the car, every scan</span>
+  </div>
+
+  <section class="lane pc">
+    <div class="lane-head"><h2>Set up the bridge PC</h2><p>About 20 minutes</p></div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Install VX Manager and the GM driver</h3><p>The same install Tech2Win uses. Confirm the VCX Nano shows as connected in VX Manager.</p></div>
+      <div class="step"><div class="num">2</div><h3>Install 32-bit Python 3.9+</h3><p>The VCX J2534 driver is 32-bit, so the 64-bit Python can't load it.</p></div>
+      <div class="step"><div class="num">3</div><h3>Check the driver is found</h3><p>Run <code>python vcx_bridge.py --list</code>. You should see a VX / VCX entry.</p></div>
+      <div class="step"><div class="num">4</div><h3>Start the bridge and note the address</h3><p>Run <code>python vcx_bridge.py</code>. Allow it through Windows Firewall on private networks. Write down the IP it prints.</p></div>
+    </div>
+  </section>
+
+  <section class="lane mac">
+    <div class="lane-head"><h2>Put the app on your iPhone</h2><p>About 30 minutes</p></div>
+    <div class="steps">
+      <div class="step"><div class="num">5</div><h3>Install Xcode and XcodeGen</h3><p>Xcode from the Mac App Store, then <code>brew install xcodegen</code>.</p></div>
+      <div class="step"><div class="num">6</div><h3>Generate the project</h3><p>In the <code>ios</code> folder run <code>xcodegen</code>, then open <code>VCXDiag.xcodeproj</code>.</p></div>
+      <div class="step"><div class="num">7</div><h3>Sign with your Apple ID</h3><p>Pick your team under Signing &amp; Capabilities. A free Apple ID works, but the app must be reinstalled every 7 days.</p></div>
+      <div class="step"><div class="num">8</div><h3>Run it on the iPhone</h3><p>Plug the iPhone in, press Run, and trust the developer under Settings › General › VPN &amp; Device Management.</p></div>
+    </div>
+  </section>
+
+  <section class="lane car">
+    <div class="lane-head"><h2>Scan a vehicle</h2><p>Every time</p></div>
+    <div class="steps">
+      <div class="step"><div class="num">9</div><h3>Plug the VCX Nano into the OBD port</h3><p>Key on, engine off. Keep it connected to the PC running the bridge.</p></div>
+      <div class="step"><div class="num">10</div><h3>Connect from the app</h3><p>Same WiFi as the PC. Enter the bridge address on the Connect tab and tap Connect. Allow local network access.</p></div>
+      <div class="step"><div class="num">11</div><h3>Open the right bus</h3><p>J1850 VPW (Class 2) for most GM up to 2007. HS-CAN / GMLAN for 2008 and newer.</p></div>
+      <div class="step"><div class="num">12</div><h3>Scan, read codes, watch data</h3><p>Codes tab › Scan finds modules and their codes. Live data shows RPM, temps, trims and more.</p></div>
+    </div>
+  </section>
+
+  <section class="lane done">
+    <div class="lane-head"><h2>Before trusting it on a real car</h2></div>
+    <div class="steps">
+      <div class="step"><span class="tag">Optional first</span><h3>Dry run with no car</h3><p>Run <code>python vcx_bridge.py --simulate</code> to fake a 2004 GM truck and try every screen of the app.</p></div>
+      <div class="step"><span class="tag me">Claude</span><h3>Move the code to GitHub</h3><p>Waiting on an empty repo name from you, then I open a pull request.</p></div>
+      <div class="step"><span class="tag me">Claude</span><h3>Fix the first Xcode build</h3><p>The Swift code hasn't been compiled yet. Send me any build errors and I'll fix them.</p></div>
+      <div class="step"><span class="tag me">Claude + you</span><h3>Check on a real vehicle</h3><p>Module addresses and GM commands come from public docs and need confirming on your car.</p></div>
+    </div>
+  </section>
+</div>
