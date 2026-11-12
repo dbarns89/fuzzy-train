@@ -1,0 +1,29 @@
+<UserControl x:Class="VcxDiag.App.Views.ReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="Vehicle report" Style="{StaticResource H2}"/>
+                <TextBlock Style="{StaticResource Muted}" Margin="0,0,0,10"
+                           Text="Creates a printable page with the VIN, modules, trouble codes, readiness and freeze frame from this session. Run the health check and read the emissions page first for a complete report."/>
+                <WrapPanel>
+                    <Button Content="Create report" Command="{Binding SaveReportCommand}" Style="{StaticResource PrimaryButton}"/>
+                    <Button Content="Open VCX Diag folder" Command="{Binding OpenFolderCommand}"/>
+                    <Button Content="Copy log" Command="{Binding CopyLogCommand}"/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Session log" Style="{StaticResource H2}"/>
+                <ListBox ItemsSource="{Binding Shell.Log}" FontFamily="{StaticResource Mono}" FontSize="12" BorderThickness="0"
+                         VirtualizingPanel.IsVirtualizing="True"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>
