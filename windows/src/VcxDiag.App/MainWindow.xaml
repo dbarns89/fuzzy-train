@@ -1,0 +1,124 @@
+<Window x:Class="VcxDiag.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:VcxDiag.App.ViewModels"
+        xmlns:views="clr-namespace:VcxDiag.App.Views"
+        Title="VCX Diag" Width="1280" Height="820" MinWidth="980" MinHeight="620"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource WindowBackground}"
+        FontFamily="Segoe UI" FontSize="13" Icon="app.ico">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:ConnectViewModel}"><views:ConnectView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:VehicleViewModel}"><views:VehicleView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ModulesViewModel}"><views:ModulesView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CodesViewModel}"><views:CodesView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:LiveDataViewModel}"><views:LiveDataView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:EmissionsViewModel}"><views:EmissionsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TerminalViewModel}"><views:TerminalView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:MonitorViewModel}"><views:MonitorView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReportViewModel}"><views:ReportView/></DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="236"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Grid Background="{StaticResource Sidebar}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Margin="18,20,18,18">
+                <Image Source="logo.png" Width="34" Height="34"/>
+                <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="VCX Diag" Foreground="White" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock Text="GM diagnostics" Foreground="{StaticResource SidebarText}" FontSize="11"/>
+                </StackPanel>
+            </StackPanel>
+            <ListBox Grid.Row="1" ItemsSource="{Binding Pages}" SelectedItem="{Binding Current}"
+                     Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource NavItem}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" ToolTip="{Binding Hint}">
+                            <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource Icons}" FontSize="16" Width="26" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Title}" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border Grid.Row="2" Margin="12" Padding="12" CornerRadius="8" Background="{StaticResource SidebarHover}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="9" Height="9" VerticalAlignment="Center">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="#7F8C99"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Shell.IsConnected}" Value="True">
+                                            <Setter Property="Fill" Value="#F2C94C"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Shell.HasBus}" Value="True">
+                                            <Setter Property="Fill" Value="#27AE60"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                        <TextBlock Text="{Binding Shell.DeviceText}" Foreground="White" Margin="8,0,0,0" TextTrimming="CharacterEllipsis" MaxWidth="170"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding Shell.BusText}" Foreground="{StaticResource SidebarText}" FontSize="11" Margin="17,4,0,0" TextWrapping="Wrap"/>
+                    <Button Content="Disconnect" Command="{Binding QuickDisconnectCommand}" Margin="0,10,0,0" HorizontalAlignment="Stretch"
+                            Visibility="{Binding Shell.IsConnected, Converter={StaticResource BoolToVis}}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Main area -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Margin="24,18,24,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{Binding Current.Title}" Style="{StaticResource H1}"/>
+                    <TextBlock Text="{Binding Current.Hint}" Style="{StaticResource Muted}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Style="{StaticResource Chip}" ToolTip="Vehicle identification number">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE804;" FontFamily="{StaticResource Icons}" Margin="0,2,6,0" Foreground="{StaticResource TextMuted}"/>
+                            <TextBlock Text="{Binding Shell.VinText}" FontFamily="{StaticResource Mono}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Chip}" ToolTip="Battery voltage at the OBD connector">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE83F;" FontFamily="{StaticResource Icons}" Margin="0,2,6,0" Foreground="{StaticResource TextMuted}"/>
+                            <TextBlock Text="{Binding Shell.BatteryText}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <ContentControl Grid.Row="1" Content="{Binding Current.Page}" Margin="24,4,24,8" Focusable="False"/>
+
+            <Border Grid.Row="2" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0" Padding="24,7">
+                <StackPanel Orientation="Horizontal">
+                    <ProgressBar IsIndeterminate="True" Width="80" Height="6" Margin="0,0,12,0" VerticalAlignment="Center"
+                                 Visibility="{Binding Shell.Busy, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding Shell.Status}" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
